@@ -21,5 +21,5 @@ class Lead(db.Model):
     email = Column(String,unique=True, nullable=False)
     phone = Column(String,unique=True, nullable=False)
     creation_date = Column(DateTime,default=datetime.now())
-    last_visit = Column(DateTime)
+    last_visit = Column(DateTime, default=datetime.now())
     visits = Column(Integer, default=1)
