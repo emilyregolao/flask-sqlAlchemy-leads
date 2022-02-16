@@ -10,13 +10,15 @@ def create_lead():
     
     valid_keys, invalid_keys = validate_keys(data)
     received_keys = [key for key in data.keys()]
-    
+
     if invalid_keys:
         return jsonify({"error": "invalid keys", "expected": valid_keys, "received": received_keys}), HTTPStatus.BAD_REQUEST
-    elif not is_valid_phone(data['phone']):
-        return jsonify({"error": "phone data in wrong format", "expected format": "(xx)xxxxx-xxxx", "received": data['phone']}), HTTPStatus.BAD_REQUEST
 
     try:
+        
+        if not is_valid_phone(data['phone']):
+            return jsonify({"error": "phone data in wrong format", "expected format": ["(xx)xxxxx-xxxx"], "received": [data['phone']]}), HTTPStatus.BAD_REQUEST
+        
         lead = Lead(
             name = data['name'],
             email = data['email'],
