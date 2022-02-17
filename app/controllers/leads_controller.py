@@ -1,3 +1,4 @@
+from audioop import reverse
 from flask import request, jsonify
 from http import HTTPStatus
 from sqlalchemy import exc
@@ -36,7 +37,16 @@ def create_lead():
 
 
 def get_leads():
-    ...
+    data = (
+        Lead
+        .query
+        .all())
+    
+    if not data: 
+        return jsonify({"error": "no data found"}), HTTPStatus.NOT_FOUND
+    
+    return jsonify(data), HTTPStatus.OK
+
 
 def update_lead():
     ...
