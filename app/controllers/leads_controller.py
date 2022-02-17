@@ -7,6 +7,8 @@ from app.controllers.json_controller import validate_keys, is_valid_phone, is_va
 from app.models.leads_model import Lead
 from app.configs.database import db
 
+
+# POST ROUTE CONTROLLER 
 def create_lead():
     data = request.get_json()
 
@@ -33,6 +35,8 @@ def create_lead():
     except TypeError as _: 
         return jsonify({"error": "all values must be of type string"}), HTTPStatus.BAD_REQUEST
 
+
+# GET ROUTE CONTROLLER 
 def get_leads():
     try:
         session: Session = db.session
@@ -43,27 +47,49 @@ def get_leads():
     return jsonify(leads), HTTPStatus.OK
 
 
+# UPDATE ROUTE CONTROLLER 
 def update_lead():
     data = request.get_json()
+    session: Session = db.session
+    base_query = session.query(Lead)
    
     if not is_valid_data_type(data):    
         return jsonify({"data": "the value must be of type string"}), HTTPStatus.BAD_REQUEST
     if not is_valid_email_key(data):
         return jsonify({"error": "wrong key(s)", "expected": ["email"], "received": list(data.keys())}), HTTPStatus.BAD_REQUEST
 
-    try:        
-        email = list(data.values())[0]
-        
-        session: Session = db.session
-        lead = session.query(Lead).filter(Lead.email == email).first()
-        lead.visits = lead.visits + 1
-        lead.last_visit = datetime.now()
-        
-        db.session.commit()
-        return "", HTTPStatus.OK
+    email = list(data.values())[0]
+    updated_lead = base_query.filter(Lead.email == email).first()
 
-    except:
+    if not updated_lead:
         return jsonify({"error": "email not found in database"}), HTTPStatus.NOT_FOUND
 
+    updated_lead.visits = updated_lead.visits + 1
+    updated_lead.last_visit = datetime.now()
+    session.commit()
+
+    return "", HTTPStatus.OK
+
+
+# DELETE ROUTE CONTROLLER 
 def delete_lead():
-    ...
+    data = request.get_json()
+    session: Session = db.session
+    base_query = session.query(Lead)
+   
+    if not is_valid_data_type(data):    
+        return jsonify({"data": "the value must be of type string"}), HTTPStatus.BAD_REQUEST
+    if not is_valid_email_key(data):
+        return jsonify({"error": "wrong key(s)", "expected": ["email"], "received": list(data.keys())}), HTTPStatus.BAD_REQUEST
+
+    email = list(data.values())[0]
+    deleted_lead = base_query.filter(Lead.email == email).first()
+
+    if not deleted_lead:
+        return jsonify({"error": "email not found in database"}), HTTPStatus.NOT_FOUND
+
+    session.delete(deleted_lead)
+    session.commit()
+
+    return "", HTTPStatus.OK
+    
