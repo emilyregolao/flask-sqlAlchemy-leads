@@ -17,3 +17,15 @@ def is_valid_phone(phone: str):
         return True
     
     return False
+
+def is_valid_data_type(data: dict):
+    for value in data.values():    
+        if type(value) != str:
+            return False
+    return True
+
+def is_valid_email_key(data: dict):
+    for key in data.keys():
+        if key != "email":
+            return False
+    return True
